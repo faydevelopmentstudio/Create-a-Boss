@@ -9,14 +9,14 @@
 	<style>
 		:root {
 			color-scheme: dark;
-			--bg: #111819;
-			--panel: #182122;
-			--panel-raised: #202a2a;
+			--bg: #090a0e;
+			--panel: #1a1b23;
+			--panel-raised: #24252e;
 			--line: rgba(215, 236, 222, .12);
 			--muted: #91a29b;
 			--text: #e9f0e9;
-			--accent: #43e6d1;
-			--danger: #ff735f;
+			--accent: #e63946;
+			--danger: #ff777c;
 			--display: "Bahnschrift", "Franklin Gothic Medium", "Arial Narrow", sans-serif;
 			--mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 			font-family: "Trebuchet MS", "Segoe UI", sans-serif;
@@ -26,7 +26,7 @@
 			text-rendering: optimizeLegibility;
 		}
 		* { box-sizing: border-box; }
-		body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 76% 15%, rgba(80, 115, 90, .13), transparent 35%), linear-gradient(150deg, #141c1d, #101516 64%); }
+		body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 76% 15%, rgba(153, 35, 48, .14), transparent 35%), linear-gradient(150deg, #111117, #090a0e 64%); }
 		button, input { font: inherit; }
 		button { color: inherit; }
 		button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -160,6 +160,30 @@
 		.record-form label { margin-right: auto; font-size: 12px; }
 		.record-form input { min-width: 170px; height: 42px; padding: 0 11px; color: var(--text); border: 1px solid var(--line); background: #111819; }
 		.download-button { margin-top: 28px; }
+		.editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+		.editor-main, .editor-inspector { min-width: 0; }
+		.editor-toolbar, .editor-actions, .editor-tabs, .editor-palette { display: flex; flex-wrap: wrap; gap: 6px; }
+		.editor-toolbar { margin-bottom: 12px; }
+		.editor-tool, .editor-action, .editor-tab { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); background: #191a22; color: #c8c9d0; font-size: 11px; cursor: pointer; }
+		.editor-tool:hover, .editor-action:hover, .editor-tab:hover, .editor-tool.selected, .editor-tab.selected { border-color: var(--accent); color: #fff; }
+		.editor-stage { display: grid; grid-template-columns: minmax(0, 1fr) 118px; gap: 16px; align-items: start; }
+		.pixel-canvas { display: block; width: 100%; max-width: 620px; aspect-ratio: 1; background-color: #101117; background-image: linear-gradient(45deg, #191a22 25%, transparent 25%), linear-gradient(-45deg, #191a22 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #191a22 75%), linear-gradient(-45deg, transparent 75%, #191a22 75%); background-size: 24px 24px; background-position: 0 0, 0 12px, 12px -12px, -12px 0; border: 1px solid #454650; image-rendering: pixelated; touch-action: none; cursor: crosshair; }
+		.editor-preview { width: 100%; aspect-ratio: 1; border: 1px solid var(--line); image-rendering: pixelated; background: #111219; }
+		.editor-inspector { display: grid; gap: 13px; padding: 16px; background: #15161d; border: 1px solid var(--line); }
+		.editor-inspector label, .editor-field label { display: grid; gap: 6px; color: #aeb0ba; font: 10px var(--mono); }
+		.editor-inspector input, .editor-inspector select { min-width: 0; width: 100%; min-height: 35px; padding: 0 8px; color: var(--text); border: 1px solid var(--line); background: #0d0e13; }
+		.editor-inspector input[type="range"] { padding: 0; accent-color: var(--accent); }
+		.editor-inspector input[type="color"] { height: 38px; padding: 3px; }
+		.editor-field { display: grid; gap: 5px; }
+		.editor-palette button { width: 23px; height: 23px; border: 1px solid #fff4; background: var(--swatch); cursor: pointer; }
+		.editor-check { display: flex !important; grid-template-columns: 16px 1fr; align-items: center; }
+		.editor-check input { width: 15px; min-height: 15px; accent-color: var(--accent); }
+		.boss-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+		.boss-chip { padding: 7px 9px; border: 1px solid var(--line); background: #171820; color: #c6c7cf; cursor: pointer; font-size: 11px; }
+		.boss-chip.selected { border-color: var(--accent); color: white; }
+		.editor-meta { color: var(--muted); font: 9px var(--mono); }
+		.editor-check-row { display: flex; align-items: center; gap: 7px; color: #b3b5be; font-size: 11px; }
+		.editor-check-row input { accent-color: var(--accent); }
 		#toast { position: fixed; z-index: 10; right: 22px; bottom: 22px; max-width: min(400px, calc(100vw - 36px)); padding: 13px 17px; border: 1px solid var(--accent); background: #172220; color: var(--text); font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s; }
 		#toast.visible { opacity: 1; transform: translateY(0); }
 		.nav-collapsed .app { grid-template-columns: 72px minmax(0, 1fr); }
@@ -213,6 +237,11 @@
 			.mobile-controls [data-control="right"] { grid-area: 2 / 3; }
 			.mobile-controls [data-control="fire"] { grid-area: 3 / 2 / 4 / 4; color: var(--accent); font-size: 9px; }
 			.page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 20px; }
+			.editor-layout { grid-template-columns: 1fr; }
+			.editor-stage { grid-template-columns: minmax(0, 1fr) 82px; gap: 9px; }
+			.editor-inspector { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; }
+			.editor-inspector > .editor-actions, .editor-inspector > .editor-field:first-child { grid-column: 1 / -1; }
+			.editor-preview { position: sticky; top: 64px; }
 			.page-heading h1, .arena-heading h1 { font-size: 29px; }
 			.network-progress { width: min(100%, 300px); }
 			.contract-grid { grid-template-columns: 1fr; }
@@ -244,11 +273,12 @@
 			<div class="brand"><div class="brand-mark"><span>B</span></div><h1>BOSSFORGE<span>:</span><br>ASCENSION</h1><p>EXPANDED EDITION · 0.9.4</p></div>
 			<div><p class="nav-label">OPERATIONS</p><nav class="nav-list" aria-label="Main navigation">
 				<button class="nav-button active" data-view="play"><span class="nav-code">01</span><span class="nav-text">Arena</span></button>
-				<button class="nav-button" data-view="forge"><span class="nav-code">02</span><span class="nav-text">Ascension Network</span></button>
-				<button class="nav-button" data-view="contracts"><span class="nav-code">03</span><span class="nav-text">Contracts</span></button>
-				<button class="nav-button" data-view="vault"><span class="nav-code">04</span><span class="nav-text">Chest vault</span></button>
-				<button class="nav-button" data-view="locker"><span class="nav-code">05</span><span class="nav-text">Locker</span></button>
-				<button class="nav-button" data-view="records"><span class="nav-code">06</span><span class="nav-text">Hall of records</span></button>
+				<button class="nav-button" data-view="boss"><span class="nav-code">02</span><span class="nav-text">Boss Creator</span></button>
+				<button class="nav-button" data-view="forge"><span class="nav-code">03</span><span class="nav-text">Ascension Network</span></button>
+				<button class="nav-button" data-view="contracts"><span class="nav-code">04</span><span class="nav-text">Contracts</span></button>
+				<button class="nav-button" data-view="vault"><span class="nav-code">05</span><span class="nav-text">Chest vault</span></button>
+				<button class="nav-button" data-view="locker"><span class="nav-code">06</span><span class="nav-text">Locker</span></button>
+				<button class="nav-button" data-view="records"><span class="nav-code">07</span><span class="nav-text">Hall of records</span></button>
 			</nav></div>
 			<div class="sidebar-bottom"><div class="eyebrow">PILOT IDENTIFIED</div><div class="pilot-chip"><div class="pilot-avatar">BF</div><div class="pilot-info"><strong>FORGE PILOT</strong><small>LOCAL PROFILE</small></div></div></div>
 		</aside>
@@ -258,6 +288,7 @@
 		</div>
 	</div>
 	<div id="toast" role="status" aria-live="polite"></div>
+	<script src="game-rules.js"></script>
 	<script src="mechanics.js"></script>
 </body>
 </html>

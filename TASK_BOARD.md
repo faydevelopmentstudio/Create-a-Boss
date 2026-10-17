@@ -1,21 +1,33 @@
 # Task Board
 
-## Included in this build
+## Implemented in this slice
 
-- [x] Four playable combat modes with a moving, firing rival.
-- [x] 540-rank Ascension Network across 18 disciplines and 10 sectors.
-- [x] Five rotating contracts and quest-driven cosmetic unlocks.
-- [x] Three concurrent chest timers with credit and shard rewards.
-- [x] Sixteen themes, sixteen skins, twelve trails, and twelve arenas.
-- [x] Campaign prestige gate, local leaderboard, and completion-gated nickname entry.
-- [x] Responsive navigation, keyboard controls, mobile controls, and synthesized audio.
-- [x] Standalone HTML export from a served game page.
+- [x] Preserve `bossforge-ascension-v1` and migrate old saves without resetting existing progress.
+- [x] Gate Ascension Trial selection on 50 Campaign clears and all 540 ranks.
+- [x] Require both final trial phases before nickname registration or prestige; ordinary run endings do not unlock registration.
+- [x] Add automated tests for endgame eligibility and rank-effect bounds.
+- [x] Add a local pixel boss workshop with 16/24/32 canvas sizes, pencil, eraser, fill, line, rectangle, palette/custom colors, symmetry, layers, frame editing, undo/redo, templates, resize, JSON import/export, duplication, deletion, and local persistence.
+- [x] Add a no-reward boss sandbox that uses the saved art, health, armor, speed, attack rate, and attack pattern.
+- [x] Connect all 18 disciplines to player combat effects and increase enemy difficulty/Threat Rating for every rank.
+- [x] Use pixel-rendered player and rival sprites and a crimson base palette.
+- [x] Pause combat when navigating away or hiding the browser tab.
+- [x] Update standalone and ZIP builders to include the rules module.
 
-## Before release
+## Remaining master-spec work
 
-- [ ] Play all four modes in a browser and inspect all reward paths.
-- [ ] Complete a full 50-stage Campaign and master all 540 ranks to verify prestige.
-- [ ] Check screenshots at desktop and mobile sizes; the current workspace has no browser automation runtime.
-- [ ] Test save migration and behavior after clearing or corrupting local storage.
-- [ ] Add a backend with run verification before offering public leaderboards.
-- [ ] Host the files on GitHub Pages and verify progress persists on the published origin.
+- [ ] Browser-test editor drawing, undo/redo, frame animation, import/export, sandbox isolation, mobile interactions, and console behavior; no browser automation runtime is installed in this workspace.
+- [ ] Play all four existing modes and verify reward, chest, contract, and save/load paths.
+- [ ] Complete 50 Campaign stages, master the network, win the Ascension Trial, register a name, and verify rebirth end to end.
+- [ ] Expand the boss editor into reusable anatomy/components, opacity/shading/rotation/pan tools, phase timelines, transformations, enrage, minions, and behavior presets.
+- [ ] Build five 10-stage worlds with distinct encounters, checkpoints, hazards, bosses, and stage data.
+- [ ] Implement corruption counterplay and 30 bounded, readable Chaos Overdrive events.
+- [ ] Add network pan/zoom, prerequisite connections, search/filtering, milestones, and branch rewards.
+- [ ] Expand quests into claim-driven varied boards and add achievements/gallery rewards.
+- [ ] Animate chest opening, reward transfer, boss transformations, transitions, and prestige.
+- [ ] Add five fair rival difficulty profiles, defenses, profiles, and duel rewards.
+- [ ] Add separate volume controls, effects intensity, save import/export, color accessibility, and gamepad support.
+- [ ] Add screenshot captures at desktop/mobile sizes and include them in the release archive.
+- [ ] Add a verified backend before offering any public leaderboard.
+- [ ] Deploy to GitHub Pages and verify progress persistence on the deployed origin.
+
+This board intentionally marks only work implemented in the current source. The full master specification and 50-stage completion path are not complete.

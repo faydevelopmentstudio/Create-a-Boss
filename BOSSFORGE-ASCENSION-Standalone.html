@@ -9,14 +9,14 @@
 	<style>
 		:root {
 			color-scheme: dark;
-			--bg: #111819;
-			--panel: #182122;
-			--panel-raised: #202a2a;
+			--bg: #090a0e;
+			--panel: #1a1b23;
+			--panel-raised: #24252e;
 			--line: rgba(215, 236, 222, .12);
 			--muted: #91a29b;
 			--text: #e9f0e9;
-			--accent: #43e6d1;
-			--danger: #ff735f;
+			--accent: #e63946;
+			--danger: #ff777c;
 			--display: "Bahnschrift", "Franklin Gothic Medium", "Arial Narrow", sans-serif;
 			--mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 			font-family: "Trebuchet MS", "Segoe UI", sans-serif;
@@ -26,7 +26,7 @@
 			text-rendering: optimizeLegibility;
 		}
 		* { box-sizing: border-box; }
-		body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 76% 15%, rgba(80, 115, 90, .13), transparent 35%), linear-gradient(150deg, #141c1d, #101516 64%); }
+		body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 76% 15%, rgba(153, 35, 48, .14), transparent 35%), linear-gradient(150deg, #111117, #090a0e 64%); }
 		button, input { font: inherit; }
 		button { color: inherit; }
 		button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -160,6 +160,30 @@
 		.record-form label { margin-right: auto; font-size: 12px; }
 		.record-form input { min-width: 170px; height: 42px; padding: 0 11px; color: var(--text); border: 1px solid var(--line); background: #111819; }
 		.download-button { margin-top: 28px; }
+		.editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+		.editor-main, .editor-inspector { min-width: 0; }
+		.editor-toolbar, .editor-actions, .editor-tabs, .editor-palette { display: flex; flex-wrap: wrap; gap: 6px; }
+		.editor-toolbar { margin-bottom: 12px; }
+		.editor-tool, .editor-action, .editor-tab { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); background: #191a22; color: #c8c9d0; font-size: 11px; cursor: pointer; }
+		.editor-tool:hover, .editor-action:hover, .editor-tab:hover, .editor-tool.selected, .editor-tab.selected { border-color: var(--accent); color: #fff; }
+		.editor-stage { display: grid; grid-template-columns: minmax(0, 1fr) 118px; gap: 16px; align-items: start; }
+		.pixel-canvas { display: block; width: 100%; max-width: 620px; aspect-ratio: 1; background-color: #101117; background-image: linear-gradient(45deg, #191a22 25%, transparent 25%), linear-gradient(-45deg, #191a22 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #191a22 75%), linear-gradient(-45deg, transparent 75%, #191a22 75%); background-size: 24px 24px; background-position: 0 0, 0 12px, 12px -12px, -12px 0; border: 1px solid #454650; image-rendering: pixelated; touch-action: none; cursor: crosshair; }
+		.editor-preview { width: 100%; aspect-ratio: 1; border: 1px solid var(--line); image-rendering: pixelated; background: #111219; }
+		.editor-inspector { display: grid; gap: 13px; padding: 16px; background: #15161d; border: 1px solid var(--line); }
+		.editor-inspector label, .editor-field label { display: grid; gap: 6px; color: #aeb0ba; font: 10px var(--mono); }
+		.editor-inspector input, .editor-inspector select { min-width: 0; width: 100%; min-height: 35px; padding: 0 8px; color: var(--text); border: 1px solid var(--line); background: #0d0e13; }
+		.editor-inspector input[type="range"] { padding: 0; accent-color: var(--accent); }
+		.editor-inspector input[type="color"] { height: 38px; padding: 3px; }
+		.editor-field { display: grid; gap: 5px; }
+		.editor-palette button { width: 23px; height: 23px; border: 1px solid #fff4; background: var(--swatch); cursor: pointer; }
+		.editor-check { display: flex !important; grid-template-columns: 16px 1fr; align-items: center; }
+		.editor-check input { width: 15px; min-height: 15px; accent-color: var(--accent); }
+		.boss-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+		.boss-chip { padding: 7px 9px; border: 1px solid var(--line); background: #171820; color: #c6c7cf; cursor: pointer; font-size: 11px; }
+		.boss-chip.selected { border-color: var(--accent); color: white; }
+		.editor-meta { color: var(--muted); font: 9px var(--mono); }
+		.editor-check-row { display: flex; align-items: center; gap: 7px; color: #b3b5be; font-size: 11px; }
+		.editor-check-row input { accent-color: var(--accent); }
 		#toast { position: fixed; z-index: 10; right: 22px; bottom: 22px; max-width: min(400px, calc(100vw - 36px)); padding: 13px 17px; border: 1px solid var(--accent); background: #172220; color: var(--text); font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s; }
 		#toast.visible { opacity: 1; transform: translateY(0); }
 		.nav-collapsed .app { grid-template-columns: 72px minmax(0, 1fr); }
@@ -213,6 +237,11 @@
 			.mobile-controls [data-control="right"] { grid-area: 2 / 3; }
 			.mobile-controls [data-control="fire"] { grid-area: 3 / 2 / 4 / 4; color: var(--accent); font-size: 9px; }
 			.page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 20px; }
+			.editor-layout { grid-template-columns: 1fr; }
+			.editor-stage { grid-template-columns: minmax(0, 1fr) 82px; gap: 9px; }
+			.editor-inspector { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; }
+			.editor-inspector > .editor-actions, .editor-inspector > .editor-field:first-child { grid-column: 1 / -1; }
+			.editor-preview { position: sticky; top: 64px; }
 			.page-heading h1, .arena-heading h1 { font-size: 29px; }
 			.network-progress { width: min(100%, 300px); }
 			.contract-grid { grid-template-columns: 1fr; }
@@ -244,11 +273,12 @@
 			<div class="brand"><div class="brand-mark"><span>B</span></div><h1>BOSSFORGE<span>:</span><br>ASCENSION</h1><p>EXPANDED EDITION · 0.9.4</p></div>
 			<div><p class="nav-label">OPERATIONS</p><nav class="nav-list" aria-label="Main navigation">
 				<button class="nav-button active" data-view="play"><span class="nav-code">01</span><span class="nav-text">Arena</span></button>
-				<button class="nav-button" data-view="forge"><span class="nav-code">02</span><span class="nav-text">Ascension Network</span></button>
-				<button class="nav-button" data-view="contracts"><span class="nav-code">03</span><span class="nav-text">Contracts</span></button>
-				<button class="nav-button" data-view="vault"><span class="nav-code">04</span><span class="nav-text">Chest vault</span></button>
-				<button class="nav-button" data-view="locker"><span class="nav-code">05</span><span class="nav-text">Locker</span></button>
-				<button class="nav-button" data-view="records"><span class="nav-code">06</span><span class="nav-text">Hall of records</span></button>
+				<button class="nav-button" data-view="boss"><span class="nav-code">02</span><span class="nav-text">Boss Creator</span></button>
+				<button class="nav-button" data-view="forge"><span class="nav-code">03</span><span class="nav-text">Ascension Network</span></button>
+				<button class="nav-button" data-view="contracts"><span class="nav-code">04</span><span class="nav-text">Contracts</span></button>
+				<button class="nav-button" data-view="vault"><span class="nav-code">05</span><span class="nav-text">Chest vault</span></button>
+				<button class="nav-button" data-view="locker"><span class="nav-code">06</span><span class="nav-text">Locker</span></button>
+				<button class="nav-button" data-view="records"><span class="nav-code">07</span><span class="nav-text">Hall of records</span></button>
 			</nav></div>
 			<div class="sidebar-bottom"><div class="eyebrow">PILOT IDENTIFIED</div><div class="pilot-chip"><div class="pilot-avatar">BF</div><div class="pilot-info"><strong>FORGE PILOT</strong><small>LOCAL PROFILE</small></div></div></div>
 		</aside>
@@ -259,8 +289,65 @@
 	</div>
 	<div id="toast" role="status" aria-live="polite"></div>
 	<script>
+(function (root, factory) {
+	const rules = factory();
+	if (typeof module !== "undefined" && module.exports) module.exports = rules;
+	if (root) root.BossforgeRules = rules;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+	const DISCIPLINES = ["Impact", "Velocity", "Flux", "Fortitude", "Precision", "Salvage", "Frost", "Ember", "Storm", "Echo", "Rift", "Aegis", "Vector", "Pulse", "Ruin", "Bloom", "Gravity", "Ascendant"];
+
+	function getRankTotals(ranks) {
+		const disciplineRanks = Array(DISCIPLINES.length).fill(0);
+		for (let index = 0; index < 180; index++) {
+			disciplineRanks[Math.floor(index / 10)] += Math.max(0, Math.min(3, Number(ranks?.[index]) || 0));
+		}
+		return { disciplineRanks, totalRanks: disciplineRanks.reduce((sum, rank) => sum + rank, 0) };
+	}
+
+	function getCombatEffects(ranks) {
+		const { disciplineRanks, totalRanks } = getRankTotals(ranks);
+		const [impact, velocity, flux, fortitude, precision, salvage, frost, ember, storm, echo, rift, aegis, vector, pulse, ruin, bloom, gravity, ascendant] = disciplineRanks;
+		return {
+			disciplineRanks,
+			totalRanks,
+			threatRating: totalRanks,
+			threatPercent: totalRanks / 540 * 100,
+			enemyDifficultyMultiplier: 1 + totalRanks / 540 * 0.5,
+			damageMultiplier: 1 + impact * 0.018 + ember * 0.014 + ascendant * 0.012,
+			movementMultiplier: 1 + velocity * 0.01 + vector * 0.008,
+			fireRateMultiplier: 1 + flux * 0.012 + pulse * 0.008,
+			maxHull: 100 + fortitude * 1.5 + aegis * 0.8,
+			criticalChance: precision * 0.0025,
+			rewardMultiplier: 1 + salvage * 0.012,
+			enemySlow: frost * 0.005,
+			chainChance: storm * 0.003,
+			repeatChance: echo * 0.003,
+			dashCooldownMultiplier: Math.max(0.55, 1 - rift * 0.012),
+			shieldPoints: aegis * 0.7,
+			hullRegenPerSecond: pulse * 0.018,
+			armorPierce: ruin * 0.004,
+			killHeal: bloom * 0.35,
+			projectileSpeedMultiplier: 1 + gravity * 0.008 + precision * 0.004,
+			homingStrength: vector * 0.006
+		};
+	}
+
+	function canRegisterLeaderboard(state) {
+		const { totalRanks } = getRankTotals(state?.ranks);
+		return state?.campaignClears >= 50 && state?.stage >= 51 && totalRanks === 540 &&
+			state?.finalTrialComplete === true && state?.finalBossDefeated === true && state?.finalRivalDefeated === true;
+	}
+
+	function canStartAscensionTrial(state) {
+		const { totalRanks } = getRankTotals(state?.ranks);
+		return state?.campaignClears >= 50 && state?.stage >= 51 && totalRanks === 540;
+	}
+
+	return Object.freeze({ DISCIPLINES, getRankTotals, getCombatEffects, canStartAscensionTrial, canRegisterLeaderboard });
+});
 (() => {
 	const $ = (selector) => document.querySelector(selector);
+	const Rules = window.BossforgeRules;
 	const modes = ["Campaign", "Chaos Trial", "Rival Duel", "Endurance"];
 	const sectors = ["Core", "Plating", "Drive", "Barrel", "Sights", "Capacitor", "Thrusters", "Hull", "Targeting", "Overclock"];
 	const disciplines = ["Impact", "Velocity", "Flux", "Fortitude", "Precision", "Salvage", "Frost", "Ember", "Storm", "Echo", "Rift", "Aegis", "Vector", "Pulse", "Ruin", "Bloom", "Gravity", "Ascendant"];
@@ -268,17 +355,27 @@
 	const skins = ["Vanguard", "Scrapper", "Warden", "Courier", "Ronin", "Bastion", "Mantis", "Reactor", "Spectre", "Pilot", "Colossus", "Nomad", "Cipher", "Ranger", "Overlord", "Ascendant"];
 	const trails = ["Ion Wake", "Comet", "Static", "Emberline", "Frostbite", "Pulse", "Toxic", "Solar Flare", "Prism", "Ghost", "Arc", "Blackout"];
 	const arenas = ["The Foundry", "Glass Flats", "Storm Shelf", "Redline", "Cold Forge", "The Wreck", "Sunken Grid", "Cinder Run", "Hollow Crown", "Skyrail", "Ion Basin", "Last Light"];
-	const palettes = ["#43e6d1", "#ff6f61", "#78aaff", "#e7a85d", "#d8ee6b", "#58b9cf", "#e0c94e", "#55d3a5", "#fa7954", "#9acb78", "#b6e7f2", "#ffb943", "#ee83bc", "#b083f5", "#e7f0ff", "#a5aab6"];
-	const defaultState = () => ({ credits: 240, shards: 0, stage: 1, wins: 0, prestige: 0, completed: false, ranks: Array(180).fill(0), unlocked: { themes: [0], skins: [0], trails: [0], arenas: [0] }, equipped: { theme: 0, skin: 0, trail: 0, arena: 0 }, contracts: [], chests: [0, 0, 0], leaderboard: [], sound: true, best: 0, clears: 0 });
+	const palettes = ["#e63946", "#ff6f61", "#78aaff", "#e7a85d", "#d8ee6b", "#58b9cf", "#e0c94e", "#55d3a5", "#fa7954", "#9acb78", "#b6e7f2", "#ffb943", "#ee83bc", "#b083f5", "#e7f0ff", "#a5aab6"];
+	const EDITOR_COLORS = ["#f8fafc", "#e63946", "#ff777c", "#f59e0b", "#d8ee6b", "#55d3a5", "#58b9cf", "#78aaff", "#b083f5", "#252630"];
+	const EDITOR_SIZE = 24;
+	const EDITOR_TEMPLATES = [{ id: "wraith", name: "Cinder Wraith", category: "Elemental" }, { id: "machine", name: "Iron Cathedral", category: "Machine" }, { id: "beast", name: "Maw of the Deep", category: "Monster" }, { id: "artifact", name: "Crowned Relic", category: "Possessed Artifact" }];
+	const defaultState = () => ({ credits: 240, shards: 0, stage: 1, wins: 0, prestige: 0, completed: false, campaignClears: 0, finalTrialComplete: false, finalBossDefeated: false, finalRivalDefeated: false, completionRecordPending: false, bosses: [], selectedBossId: null, ranks: Array(180).fill(0), unlocked: { themes: [0], skins: [0], trails: [0], arenas: [0] }, equipped: { theme: 0, skin: 0, trail: 0, arena: 0 }, contracts: [], chests: [0, 0, 0], leaderboard: [], sound: true, best: 0, clears: 0 });
 	const readSave = () => {
 		try {
 			const saved = JSON.parse(localStorage.getItem("bossforge-ascension-v1"));
 			if (!saved || !Array.isArray(saved.ranks) || !saved.unlocked) return defaultState();
-			return { ...defaultState(), ...saved, ranks: Array.from({ length: 180 }, (_, i) => Math.min(3, saved.ranks[i] || 0)), unlocked: { ...defaultState().unlocked, ...saved.unlocked }, equipped: { ...defaultState().equipped, ...saved.equipped } };
+			return { ...defaultState(), ...saved, campaignClears: Number.isInteger(saved.campaignClears) ? Math.max(0, saved.campaignClears) : Math.max(0, Number(saved.stage || 1) - 1), finalTrialComplete: saved.finalTrialComplete === true, finalBossDefeated: saved.finalBossDefeated === true, finalRivalDefeated: saved.finalRivalDefeated === true, completionRecordPending: saved.completionRecordPending === true, bosses: Array.isArray(saved.bosses) ? saved.bosses.slice(0, 20).map(sanitizeBoss).filter(Boolean) : [], ranks: Array.from({ length: 180 }, (_, i) => Math.max(0, Math.min(3, Number(saved.ranks[i]) || 0))), unlocked: { ...defaultState().unlocked, ...saved.unlocked }, equipped: { ...defaultState().equipped, ...saved.equipped } };
 		} catch (_) { return defaultState(); }
 	};
 	const state = readSave();
 	const save = () => localStorage.setItem("bossforge-ascension-v1", JSON.stringify(state));
+	if (!state.bosses.length) {
+		state.bosses.push(createTemplateBoss(EDITOR_TEMPLATES[0]));
+		state.selectedBossId = state.bosses[0].id;
+		save();
+	} else if (!state.bosses.some((boss) => boss.id === state.selectedBossId)) state.selectedBossId = state.bosses[0].id;
+	const standardRivalSprite = createTemplateBoss({ id: "machine", name: "Arena Rival", category: "Machine" });
+	const ascensionRivalSprite = createTemplateBoss({ id: "beast", name: "Ascension Rival", category: "Alien" });
 	const contractTypes = [
 		{ kind: "wins", name: "Clear the field", verb: "wins", goal: 2, reward: 85 },
 		{ kind: "shots", name: "Hot barrels", verb: "shots fired", goal: 90, reward: 70 },
@@ -301,6 +398,16 @@
 	let pointerDown = false;
 	let audioContext;
 	let musicTimer;
+	let editorTool = "pencil";
+	let editorColor = "#e63946";
+	let editorLayer = "body";
+	let editorFrame = 0;
+	let editorSymmetry = false;
+	let editorGrid = true;
+	let editorPointer = null;
+	let editorHistory = [];
+	let editorRedo = [];
+	let editorZoom = 1;
 	const sound = (frequency, duration, type = "triangle") => {
 		if (!state.sound) return;
 		try {
@@ -345,25 +452,113 @@
 		for (const contract of state.contracts) if (contract.kind === kind) contract.progress += amount;
 		checkContracts();
 	};
+	function emptyFrame(size = EDITOR_SIZE) {
+		return { body: Array(size * size).fill(null), effects: Array(size * size).fill(null), visible: { body: true, effects: true } };
+	}
+	function sanitizeBoss(candidate) {
+		if (!candidate || typeof candidate !== "object") return null;
+		const size = [16, 24, 32].includes(Number(candidate.size)) ? Number(candidate.size) : EDITOR_SIZE;
+		const frames = Array.isArray(candidate.frames) ? candidate.frames.slice(0, 8).map((frame) => {
+			const normalized = emptyFrame(size);
+			for (const layer of ["body", "effects"]) {
+				const pixels = frame?.[layer];
+				if (!Array.isArray(pixels)) continue;
+				for (let i = 0; i < Math.min(pixels.length, size * size); i++) normalized[layer][i] = typeof pixels[i] === "string" && /^#[\da-f]{6}$/i.test(pixels[i]) ? pixels[i] : null;
+				normalized.visible[layer] = frame?.visible?.[layer] !== false;
+			}
+			return normalized;
+		}) : [];
+		return {
+			id: typeof candidate.id === "string" && candidate.id.length < 80 ? candidate.id : crypto.randomUUID(),
+			name: String(candidate.name || "Unnamed boss").trim().slice(0, 32) || "Unnamed boss",
+			category: ["Monster", "Humanoid", "Machine", "Artifact", "Elemental", "Alien", "Abstract"].includes(candidate.category) ? candidate.category : "Monster",
+			size,
+			frames: frames.length ? frames : [emptyFrame(size)],
+			health: Math.round(Math.max(100, Math.min(2500, Number(candidate.health) || 450))),
+			armor: Math.round(Math.max(0, Math.min(80, Number(candidate.armor) || 0))),
+			speed: Math.max(0.45, Math.min(1.8, Number(candidate.speed) || 0.8)),
+			attackRate: Math.max(0.45, Math.min(2.2, Number(candidate.attackRate) || 1)),
+			attackPattern: ["aimed", "spread", "sweep"].includes(candidate.attackPattern) ? candidate.attackPattern : "aimed"
+		};
+	}
+	function createBlankBoss(name = "Unnamed construct", category = "Monster") {
+		return sanitizeBoss({ id: crypto.randomUUID(), name, category, size: EDITOR_SIZE, frames: [emptyFrame(), emptyFrame()] });
+	}
+	function createTemplateBoss(template) {
+		const boss = createBlankBoss(template.name, template.category);
+		const frame = boss.frames[0];
+		const core = template.id === "wraith" ? "#e63946" : template.id === "machine" ? "#8f98a8" : template.id === "beast" ? "#55a878" : "#e7a85d";
+		for (let y = 3; y < 22; y++) for (let x = 3; x < 21; x++) {
+			const dx = (x - 12) / 9; const dy = (y - 12) / 10;
+			const ellipse = dx * dx + dy * dy <= 1;
+			const rect = x >= 6 && x <= 17 && y >= 4 && y <= 20;
+			const diamond = Math.abs(x - 12) / 8 + Math.abs(y - 12) / 9 <= 1;
+			const inside = template.id === "machine" ? rect : template.id === "artifact" ? diamond : template.id === "beast" ? ellipse && !(y < 7 && x > 16) : ellipse && y < 19;
+			if (inside) frame.body[y * EDITOR_SIZE + x] = (x + y) % 6 === 0 ? "#f8fafc" : core;
+		}
+		for (let x = 8; x <= 15; x++) frame.body[7 * EDITOR_SIZE + x] = template.id === "wraith" ? "#ff777c" : core;
+		for (const x of [8, 15]) for (let y = 10; y <= 12; y++) frame.effects[y * EDITOR_SIZE + x] = "#f8fafc";
+		for (let x = 10; x <= 13; x++) frame.effects[15 * EDITOR_SIZE + x] = "#090a0e";
+		boss.frames[1] = JSON.parse(JSON.stringify(frame));
+		boss.health = 620; boss.armor = 16; boss.speed = 0.82; boss.attackRate = 1.05;
+		return boss;
+	}
+	const selectedBoss = () => state.bosses.find((boss) => boss.id === state.selectedBossId) || state.bosses[0];
+	function saveEditorHistory() {
+		const frame = selectedBoss()?.frames[editorFrame];
+		if (!frame) return;
+		editorHistory.push(JSON.stringify(frame));
+		if (editorHistory.length > 60) editorHistory.shift();
+		editorRedo = [];
+	}
+	function drawBossPixels(context, boss, x, y, displaySize, frameIndex = 0) {
+		if (!boss) return;
+		const size = boss.size; const frame = boss.frames[frameIndex % boss.frames.length] || boss.frames[0];
+		for (const layer of ["body", "effects"]) {
+			if (frame.visible[layer] === false) continue;
+			for (let i = 0; i < size * size; i++) {
+				const color = frame[layer][i];
+				if (!color) continue;
+				context.fillStyle = color;
+				context.fillRect(x + i % size * displaySize / size, y + Math.floor(i / size) * displaySize / size, displaySize / size, displaySize / size);
+			}
+		}
+	}
+	function drawPilotSprite(context, centerX, centerY, displaySize, skin, color) {
+		const designs = [
+			["00100", "01110", "11111", "10101", "11111", "01010", "01010"],
+			["10001", "11011", "11111", "10101", "11111", "01110", "01010"],
+			["00100", "10101", "01110", "11111", "11111", "01010", "10001"]
+		];
+		const design = designs[skin % designs.length]; const scale = displaySize / design.length; const left = centerX - displaySize / 2; const top = centerY - displaySize / 2;
+		context.fillStyle = "#090a0e";
+		for (let y = 0; y < design.length; y++) for (let x = 0; x < design[y].length; x++) if (design[y][x] === "1") context.fillRect(left + x * scale + 1, top + y * scale + 1, scale, scale);
+		context.fillStyle = color;
+		for (let y = 0; y < design.length; y++) for (let x = 0; x < design[y].length; x++) if (design[y][x] === "1") context.fillRect(left + x * scale, top + y * scale, scale, scale);
+		context.fillStyle = "#f8fafc"; context.fillRect(centerX - scale, centerY - scale, scale, scale); context.fillRect(centerX + scale, centerY - scale, scale, scale);
+	}
 	function render() {
 		const main = $("#view");
 		document.documentElement.style.setProperty("--accent", palettes[state.equipped.theme] || palettes[0]);
 		$("#credits").textContent = state.credits.toLocaleString();
 		$("#shards").textContent = state.shards;
-		$("#stage-label").textContent = `STAGE ${String(state.stage).padStart(2, "0")}`;
+		const stageLabel = $("#stage-label");
+		if (stageLabel) stageLabel.textContent = `STAGE ${String(state.stage).padStart(2, "0")}`;
 		document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === currentView));
 		if (currentView === "play") main.innerHTML = playView();
+		if (currentView === "boss") main.innerHTML = bossEditorView();
 		if (currentView === "forge") main.innerHTML = forgeView();
 		if (currentView === "contracts") main.innerHTML = contractsView();
 		if (currentView === "locker") main.innerHTML = lockerView();
 		if (currentView === "vault") main.innerHTML = vaultView();
 		if (currentView === "records") main.innerHTML = recordsView();
+		if (currentView === "boss") bindEditorCanvas();
 		if (game && currentView === "play") game.canvas = $("#arena");
 		if (game && currentView === "play") drawGame();
 	}
 	function playView() {
 		const result = game && !game.active ? game.result : null;
-		return `<section class="play-layout"><div class="arena-column"><div class="arena-heading"><div><span class="eyebrow">ASCENSION NETWORK / ${arenas[state.equipped.arena].toUpperCase()}</span><h1>${selectedMode}</h1></div><span id="stage-label" class="stage-tag">STAGE ${String(state.stage).padStart(2, "0")}</span></div><div class="canvas-wrap"><canvas id="arena" aria-label="Bossforge combat arena"></canvas><div id="arena-hud" class="arena-hud ${result ? "result" : ""}"><span id="player-hp">${result ? `REWARD +${result.reward} CR` : "HULL 100%"}</span><span id="run-status">${result ? result.message : "READY"}</span><span id="boss-hp">${result ? `${result.score} PTS` : "TARGET 100%"}</span></div><div class="mobile-controls"><button data-control="up" aria-label="Move up">↑</button><button data-control="left" aria-label="Move left">←</button><button data-control="down" aria-label="Move down">↓</button><button data-control="right" aria-label="Move right">→</button><button data-control="fire" aria-label="Fire">FIRE</button></div></div><div class="run-bar"><div class="mode-select">${modes.map((mode) => `<button data-mode="${mode}" class="mode-button ${selectedMode === mode ? "selected" : ""}">${mode}</button>`).join("")}</div><button id="launch" class="primary-button">${game && game.active ? "RESTART RUN" : "LAUNCH ARENA"}<span>↗</span></button></div><p class="control-hint">WASD / arrows to move · Space to fire · touch controls supported</p></div><aside class="play-rail"><div class="rail-title"><span class="eyebrow">FIELD REPORT</span><span class="live-dot"></span></div><div class="rail-stat"><span>Clears</span><strong>${state.clears}</strong></div><div class="rail-stat"><span>Best run</span><strong>${state.best} <small>pts</small></strong></div><div class="rail-stat"><span>Ascensions</span><strong>${state.prestige}</strong></div><div class="rail-contract"><div class="eyebrow">ACTIVE CONTRACTS</div>${state.contracts.slice(0, 3).map((c) => `<div class="mini-contract"><span>${c.name}</span><b>${Math.min(c.progress, c.goal)}/${c.goal}</b></div>`).join("")}<button data-view="contracts" class="text-button">All contracts <span>→</span></button></div><div class="rail-contract chest-mini"><div class="eyebrow">CHEST VAULT</div><p>${readyChests()} chests ready to claim</p><button data-view="vault" class="text-button">Open vault <span>→</span></button></div></aside></section>`;
+		return `<section class="play-layout"><div class="arena-column"><div class="arena-heading"><div><span class="eyebrow">ASCENSION NETWORK / ${arenas[state.equipped.arena].toUpperCase()}</span><h1>${selectedMode}</h1></div><span id="stage-label" class="stage-tag">STAGE ${String(state.stage).padStart(2, "0")}</span></div><div class="canvas-wrap"><canvas id="arena" aria-label="Bossforge combat arena"></canvas><div id="arena-hud" class="arena-hud ${result ? "result" : ""}"><span id="player-hp">${result ? `REWARD +${result.reward} CR` : "HULL 100%"}</span><span id="run-status">${result ? result.message : "READY"}</span><span id="boss-hp">${result ? `${result.score} PTS` : "TARGET 100%"}</span></div><div class="mobile-controls"><button data-control="up" aria-label="Move up">↑</button><button data-control="left" aria-label="Move left">←</button><button data-control="down" aria-label="Move down">↓</button><button data-control="right" aria-label="Move right">→</button><button data-control="fire" aria-label="Fire">FIRE</button></div></div><div class="run-bar"><div class="mode-select">${modes.map((mode) => `<button data-mode="${mode}" class="mode-button ${selectedMode === mode ? "selected" : ""}">${mode}</button>`).join("")}<button data-mode="Ascension Trial" class="mode-button ${selectedMode === "Ascension Trial" ? "selected" : ""}" ${Rules.canStartAscensionTrial(state) ? "" : 'disabled title="Requires 50 Campaign clears and all 540 network ranks"'}>Ascension Trial</button></div><button id="launch" class="primary-button">${game && game.active ? "RESTART RUN" : "LAUNCH ARENA"}<span>↗</span></button></div><p class="control-hint">WASD / arrows to move · Space to fire · touch controls supported</p></div><aside class="play-rail"><div class="rail-title"><span class="eyebrow">FIELD REPORT</span><span class="live-dot"></span></div><div class="rail-stat"><span>Campaign clears</span><strong>${state.campaignClears}/50</strong></div><div class="rail-stat"><span>Threat rating</span><strong>${Rules.getCombatEffects(state.ranks).threatRating}</strong></div><div class="rail-stat"><span>Ascensions</span><strong>${state.prestige}</strong></div><div class="rail-contract"><div class="eyebrow">ACTIVE CONTRACTS</div>${state.contracts.slice(0, 3).map((c) => `<div class="mini-contract"><span>${c.name}</span><b>${Math.min(c.progress, c.goal)}/${c.goal}</b></div>`).join("")}<button data-view="contracts" class="text-button">All contracts <span>→</span></button></div><div class="rail-contract chest-mini"><div class="eyebrow">CHEST VAULT</div><p>${readyChests()} chests ready to claim</p><button data-view="vault" class="text-button">Open vault <span>→</span></button></div></aside></section>`;
 	}
 	const readyChests = () => state.chests.filter((time) => time > 0 && time <= Date.now()).length;
 	const upgradeCost = (index, rank) => 18 + (index % 7) * 3 + rank * 22;
@@ -383,63 +578,236 @@
 		const now = Date.now();
 		return `<section class="page-view"><div class="page-heading"><div><span class="eyebrow">THREE LIVE COUNTDOWNS</span><h1>Chest vault</h1><p>Claim credits and forge shards when a slot is ready.</p></div></div><div class="vault-grid">${[25, 55, 95].map((seconds, i) => { const time = state.chests[i]; const ready = time > 0 && time <= now; const countdown = time ? Math.max(0, time - now) : 0; return `<article class="vault-slot ${ready ? "ready" : ""}"><span class="eyebrow">SLOT 0${i + 1} / ${seconds} SEC</span><div class="chest-art">${ready ? "✦" : "▣"}</div><strong>${ready ? "READY TO CLAIM" : time ? formatTime(countdown) : "AWAITING RUN"}</strong><p>${ready ? "A supply cache is waiting." : time ? "The forge is assembling your cache." : "Launch an arena to start the timer."}</p><button class="${ready ? "primary-button" : "secondary-button"}" data-chest="${i}" ${ready ? "" : "disabled"}>${ready ? "CLAIM CACHE" : "LOCKED"}</button></article>`; }).join("")}</div></section>`;
 	}
+	function bossEditorView() {
+		const boss = selectedBoss();
+		if (!boss) return `<section class="page-view"><h1>Boss Creator</h1><button class="primary-button" data-new-boss>CREATE BOSS</button></section>`;
+		return `<section class="page-view">
+			<div class="page-heading"><div><span class="eyebrow">PIXEL WORKSHOP / LOCAL DESIGNS</span><h1>Boss Creator</h1><p>Draw a boss, tune its behavior, then test it in a no-reward sandbox.</p></div><span class="count-badge">${state.bosses.length} / 20 DESIGNS</span></div>
+			<div class="boss-list">${state.bosses.map((item) => `<button class="boss-chip ${item.id === boss.id ? "selected" : ""}" data-select-boss="${escapeHTML(item.id)}">${escapeHTML(item.name)}</button>`).join("")}<button class="editor-action" data-new-boss>+ NEW</button></div>
+			<div class="editor-toolbar">${["pencil", "eraser", "fill", "line", "rectangle"].map((tool) => `<button class="editor-tool ${editorTool === tool ? "selected" : ""}" data-tool="${tool}">${tool.toUpperCase()}</button>`).join("")}<button class="editor-tool" data-undo ${editorHistory.length ? "" : "disabled"}>UNDO</button><button class="editor-tool" data-redo ${editorRedo.length ? "" : "disabled"}>REDO</button><label class="editor-check-row"><input type="checkbox" data-symmetry ${editorSymmetry ? "checked" : ""}> MIRROR</label><label class="editor-check-row"><input type="checkbox" data-grid ${editorGrid ? "checked" : ""}> GRID</label><button class="editor-tool" data-zoom="-1" aria-label="Zoom out">−</button><span class="editor-meta">${Math.round(editorZoom * 100)}%</span><button class="editor-tool" data-zoom="1" aria-label="Zoom in">+</button></div>
+			<div class="boss-list">${EDITOR_TEMPLATES.map((template) => `<button class="boss-chip" data-template="${template.id}">+ ${template.name}</button>`).join("")}<span class="editor-meta">STARTER FRAMES</span></div>
+			<div class="editor-layout"><div class="editor-main">
+				<div class="editor-tabs">${boss.frames.map((_, index) => `<button class="editor-tab ${editorFrame === index ? "selected" : ""}" data-frame="${index}">FRAME ${index + 1}</button>`).join("")}<button class="editor-tab" data-add-frame>+ FRAME</button><button class="editor-tab" data-delete-frame ${boss.frames.length <= 1 ? "disabled" : ""}>DELETE FRAME</button><button class="editor-tab ${editorLayer === "body" ? "selected" : ""}" data-layer="body">BODY LAYER</button><button class="editor-tab ${editorLayer === "effects" ? "selected" : ""}" data-layer="effects">EFFECTS LAYER</button><label class="editor-check-row"><input type="checkbox" data-layer-visible ${boss.frames[editorFrame].visible[editorLayer] !== false ? "checked" : ""}> VISIBLE</label></div>
+				<div class="editor-stage"><canvas id="pixel-editor" class="pixel-canvas" width="${boss.size}" height="${boss.size}" style="width:min(100%, ${Math.round(560 * editorZoom)}px)" aria-label="Editable ${boss.size} by ${boss.size} boss sprite"></canvas><canvas id="boss-preview" class="editor-preview" width="96" height="96" aria-label="Animated boss preview"></canvas></div>
+				<div class="editor-palette">${EDITOR_COLORS.map((color) => `<button style="--swatch:${color}" data-color="${color}" aria-label="Select color ${color}" title="${color}"></button>`).join("")}<label class="editor-action">CUSTOM COLOR <input type="color" data-custom-color value="${editorColor}" aria-label="Choose custom pixel color"></label></div>
+				<div class="editor-actions"><button class="primary-button" data-save-boss>SAVE DESIGN</button><button class="secondary-button" data-test-boss>TEST BOSS</button><button class="editor-action" data-duplicate-boss>DUPLICATE</button><button class="editor-action" data-export-boss>EXPORT JSON</button><button class="editor-action" data-import-boss>IMPORT JSON</button><input id="boss-import-file" type="file" accept="application/json,.json" hidden><button class="editor-action" data-delete-boss>DELETE</button></div>
+			</div><aside class="editor-inspector">
+				<label>DESIGN NAME<input type="text" maxlength="32" data-boss-prop="name" value="${escapeHTML(boss.name)}"></label>
+				<label>ANATOMY<select data-boss-prop="category">${["Monster", "Humanoid", "Machine", "Artifact", "Elemental", "Alien", "Abstract"].map((category) => `<option ${boss.category === category ? "selected" : ""}>${category}</option>`).join("")}</select></label>
+				<label>SPRITE SIZE<select data-size>${[16, 24, 32].map((size) => `<option value="${size}" ${boss.size === size ? "selected" : ""}>${size} × ${size}</option>`).join("")}</select></label>
+				<label>HEALTH <output id="boss-health-value">${boss.health}</output><input type="range" min="100" max="2500" step="25" data-boss-prop="health" value="${boss.health}"></label>
+				<label>ARMOR <output id="boss-armor-value">${boss.armor}</output><input type="range" min="0" max="80" step="1" data-boss-prop="armor" value="${boss.armor}"></label>
+				<label>MOVEMENT <output id="boss-speed-value">${boss.speed.toFixed(2)}</output><input type="range" min="0.45" max="1.8" step="0.05" data-boss-prop="speed" value="${boss.speed}"></label>
+				<label>ATTACK FREQUENCY <output id="boss-rate-value">${boss.attackRate.toFixed(2)}×</output><input type="range" min="0.45" max="2.2" step="0.05" data-boss-prop="attackRate" value="${boss.attackRate}"></label>
+				<label>ATTACK PATTERN<select data-boss-prop="attackPattern"><option value="aimed" ${boss.attackPattern === "aimed" ? "selected" : ""}>Aimed shots</option><option value="spread" ${boss.attackPattern === "spread" ? "selected" : ""}>Three-way spread</option><option value="sweep" ${boss.attackPattern === "sweep" ? "selected" : ""}>Sweeping volley</option></select></label>
+				<div class="editor-meta">SANDBOX POWER BUDGET: ${boss.health + boss.armor * 8 + Math.round(boss.speed * 120 + boss.attackRate * 90)} / 4,000</div>
+			</aside></div></section>`;
+	}
+	function editorPoint(event, canvas) {
+		const rect = canvas.getBoundingClientRect(); const boss = selectedBoss();
+		return { x: Math.max(0, Math.min(boss.size - 1, Math.floor((event.clientX - rect.left) / rect.width * boss.size))), y: Math.max(0, Math.min(boss.size - 1, Math.floor((event.clientY - rect.top) / rect.height * boss.size))) };
+	}
+	function paintPixel(x, y, color) {
+		const boss = selectedBoss(); const frame = boss?.frames[editorFrame];
+		if (!frame || x < 0 || y < 0 || x >= boss.size || y >= boss.size) return;
+		const paint = (px) => { frame[editorLayer][y * boss.size + px] = color; };
+		paint(x);
+		if (editorSymmetry) paint(boss.size - 1 - x);
+	}
+	function drawEditorLine(from, to, color) {
+		let x = from.x; let y = from.y;
+		const dx = Math.abs(to.x - x); const sx = x < to.x ? 1 : -1;
+		const dy = -Math.abs(to.y - y); const sy = y < to.y ? 1 : -1;
+		let error = dx + dy;
+		while (true) {
+			paintPixel(x, y, color);
+			if (x === to.x && y === to.y) break;
+			const twice = error * 2;
+			if (twice >= dy) { error += dy; x += sx; }
+			if (twice <= dx) { error += dx; y += sy; }
+		}
+	}
+	function fillEditorRegion(point, color) {
+		const boss = selectedBoss(); const frame = boss.frames[editorFrame];
+		const fillFrom = (startX) => {
+			const pixels = frame[editorLayer]; const target = pixels[point.y * boss.size + startX];
+			if (target === color) return;
+			const stack = [[startX, point.y]];
+			while (stack.length) {
+				const [x, y] = stack.pop();
+				if (x < 0 || y < 0 || x >= boss.size || y >= boss.size || pixels[y * boss.size + x] !== target) continue;
+				pixels[y * boss.size + x] = color;
+				stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+			}
+		};
+		fillFrom(point.x);
+		if (editorSymmetry) fillFrom(boss.size - 1 - point.x);
+	}
+	function drawEditorRectangle(start, end, color) {
+		for (let x = Math.min(start.x, end.x); x <= Math.max(start.x, end.x); x++) {
+			paintPixel(x, start.y, color); paintPixel(x, end.y, color);
+		}
+		for (let y = Math.min(start.y, end.y); y <= Math.max(start.y, end.y); y++) {
+			paintPixel(start.x, y, color); paintPixel(end.x, y, color);
+		}
+	}
+	function drawEditorCanvas() {
+		const boss = selectedBoss(); const canvas = $("#pixel-editor"); const preview = $("#boss-preview");
+		if (!boss || !canvas || !preview) return;
+		const context = canvas.getContext("2d"); context.clearRect(0, 0, boss.size, boss.size);
+		drawBossPixels(context, boss, 0, 0, boss.size, editorFrame);
+		if (editorGrid) {
+			context.strokeStyle = "rgba(255,255,255,.16)"; context.lineWidth = 0.035;
+			for (let i = 0; i <= boss.size; i++) { context.beginPath(); context.moveTo(i, 0); context.lineTo(i, boss.size); context.stroke(); context.beginPath(); context.moveTo(0, i); context.lineTo(boss.size, i); context.stroke(); }
+		}
+		const previewContext = preview.getContext("2d"); previewContext.clearRect(0, 0, preview.width, preview.height);
+		const previewFrame = Math.floor(Date.now() / 360) % boss.frames.length;
+		const bob = Math.sin(Date.now() / 240) * 2;
+		drawBossPixels(previewContext, boss, 8, 8 + bob, 80, previewFrame);
+	}
+	function bindEditorCanvas() {
+		const canvas = $("#pixel-editor");
+		if (!canvas) return;
+		canvas.addEventListener("pointerdown", (event) => {
+			event.preventDefault(); canvas.setPointerCapture(event.pointerId); saveEditorHistory();
+			const point = editorPoint(event, canvas); editorPointer = { start: point, last: point };
+			if (editorTool === "pencil") drawEditorLine(point, point, editorColor);
+			if (editorTool === "eraser") drawEditorLine(point, point, null);
+			if (editorTool === "fill") fillEditorRegion(point, editorColor);
+			drawEditorCanvas();
+		});
+		canvas.addEventListener("pointermove", (event) => {
+			if (!editorPointer || !["pencil", "eraser"].includes(editorTool)) return;
+			const point = editorPoint(event, canvas); drawEditorLine(editorPointer.last, point, editorTool === "eraser" ? null : editorColor); editorPointer.last = point; drawEditorCanvas();
+		});
+		const finishStroke = (event) => {
+			if (!editorPointer) return;
+			const point = editorPoint(event, canvas);
+			if (editorTool === "line") drawEditorLine(editorPointer.start, point, editorColor);
+			if (editorTool === "rectangle") drawEditorRectangle(editorPointer.start, point, editorColor);
+			editorPointer = null; save(); drawEditorCanvas();
+		};
+		canvas.addEventListener("pointerup", finishStroke);
+		canvas.addEventListener("pointercancel", finishStroke);
+		drawEditorCanvas();
+	}
+	function resizeBoss(boss, size) {
+		if (!boss || ![16, 24, 32].includes(size) || size === boss.size) return;
+		for (const frame of boss.frames) for (const layer of ["body", "effects"]) {
+			const oldPixels = frame[layer]; const next = Array(size * size).fill(null);
+			for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) next[y * size + x] = oldPixels[Math.floor(y * boss.size / size) * boss.size + Math.floor(x * boss.size / size)];
+			frame[layer] = next;
+		}
+		boss.size = size;
+	}
 	function recordsView() {
 		const sorted = [...state.leaderboard].sort((a, b) => b.score - a.score).slice(0, 10);
-		return `<section class="page-view"><div class="page-heading"><div><span class="eyebrow">LOCAL / THIS BROWSER ONLY</span><h1>Hall of records</h1><p>Scores are local. A public board needs a verified server.</p></div><span class="count-badge">${state.completed ? "REGISTRATION OPEN" : "COMPLETE A RUN TO REGISTER"}</span></div><div class="leaderboard"><div class="leader-head"><span>RANK</span><span>PILOT</span><span>MODE</span><span>SCORE</span></div>${sorted.length ? sorted.map((entry, i) => `<div class="leader-entry"><span>${String(i + 1).padStart(2, "0")}</span><strong>${escapeHTML(entry.name)}</strong><span>${escapeHTML(entry.mode)}</span><b>${entry.score.toLocaleString()}</b></div>`).join("") : `<div class="empty-records">No records yet. Clear a run to make the board.</div>`}</div>${state.completed ? `<form id="record-form" class="record-form"><label for="nickname">Register completed run</label><input id="nickname" name="nickname" maxlength="18" minlength="2" placeholder="Pilot nickname" required><button class="primary-button">SUBMIT SCORE</button></form>` : ""}<button class="secondary-button download-button" id="download-standalone">DOWNLOAD STANDALONE HTML</button></section>`;
+		const registrationReady = state.completionRecordPending && Rules.canRegisterLeaderboard(state);
+		return `<section class="page-view"><div class="page-heading"><div><span class="eyebrow">LOCAL / THIS BROWSER ONLY</span><h1>Hall of records</h1><p>Scores are local. Registration opens only after the 50-stage Campaign, all 540 ranks, and the final Ascension Trial.</p></div><span class="count-badge">${registrationReady ? "ASCENSION COMPLETE" : "ENDGAME REQUIREMENTS LOCKED"}</span></div><div class="leaderboard"><div class="leader-head"><span>RANK</span><span>PILOT</span><span>MODE</span><span>SCORE</span></div>${sorted.length ? sorted.map((entry, i) => `<div class="leader-entry"><span>${String(i + 1).padStart(2, "0")}</span><strong>${escapeHTML(entry.name || "UNREGISTERED")}</strong><span>${escapeHTML(entry.mode)}</span><b>${entry.score.toLocaleString()}</b></div>`).join("") : `<div class="empty-records">No records yet. Local run scores will appear here.</div>`}</div>${registrationReady ? `<form id="record-form" class="record-form"><label for="nickname">Register final Ascension clear</label><input id="nickname" name="nickname" maxlength="18" minlength="2" placeholder="Pilot nickname" required><button class="primary-button">SUBMIT SCORE</button></form>` : ""}<button class="secondary-button download-button" id="download-standalone">DOWNLOAD STANDALONE HTML</button></section>`;
 	}
 	function newGame() {
+		if (selectedMode === "Ascension Trial" && !Rules.canStartAscensionTrial(state)) return notify("Clear all 50 Campaign stages and master all 540 ranks first.");
+		cancelAnimationFrame(frame); clearInterval(musicTimer); keys.clear();
 		const canvas = $("#arena");
-		const maxBossHp = selectedMode === "Endurance" ? 100000 : (selectedMode === "Chaos Trial" ? 170 : 100) + Math.min(state.stage, 50) * 3;
-		game = { active: true, mode: selectedMode, hp: 100, bossHp: maxBossHp, maxBossHp, player: { x: 0.14, y: 0.72 }, boss: { x: 0.78, y: 0.24, phase: 0 }, bullets: [], enemyBullets: [], elapsed: 0, score: 0, lastShot: 0, lastEnemyShot: 0, lastDamage: 0, canvas };
+		const effects = Rules.getCombatEffects(state.ranks);
+		const bossConfig = selectedMode === "Boss Sandbox" ? sanitizeBoss(selectedBoss()) : null;
+		const enemyDifficulty = effects.enemyDifficultyMultiplier * (1 + Math.max(0, state.stage - 1) * 0.008);
+		const segmentHp = selectedMode === "Ascension Trial" ? 1000 : bossConfig ? bossConfig.health : (selectedMode === "Chaos Trial" ? 170 : 100) + Math.min(state.stage, 50) * 3;
+		const maxBossHp = selectedMode === "Endurance" ? 100000 : Math.round(segmentHp * enemyDifficulty);
+		game = { active: true, paused: false, mode: selectedMode, effects, enemyDifficulty, bossConfig, hp: effects.maxHull, shield: effects.shieldPoints, bossHp: maxBossHp, maxBossHp, bossArmor: bossConfig ? bossConfig.armor / 100 : 0, player: { x: 0.14, y: 0.72 }, boss: { x: 0.78, y: 0.24, phase: 0 }, bullets: [], enemyBullets: [], elapsed: 0, score: 0, lastShot: 0, lastEnemyShot: 0, lastDamage: 0, lastDash: 0, finalTrialRivalPhase: false, canvas };
 		canvas.focus();
-		state.chests = state.chests.map((time, i) => time || Date.now() + [25000, 55000, 95000][i]);
-		gain("runs", 1); save(); render(); sound(240, 0.16, "sawtooth");
+		if (selectedMode !== "Boss Sandbox") {
+			state.chests = state.chests.map((time, i) => time || Date.now() + [25000, 55000, 95000][i]);
+			gain("runs", 1);
+		}
+		save(); render(); sound(240, 0.16, "sawtooth");
 		musicTimer = setInterval(() => { if (game && game.active) sound([98, 123, 146, 110][Math.floor((game.elapsed / 1.8) % 4)], 0.28, "sine"); }, 1800);
-		cancelAnimationFrame(frame); lastTick = performance.now(); frame = requestAnimationFrame(tick);
+		lastTick = performance.now(); frame = requestAnimationFrame(tick);
 	}
 	function endGame(won) {
 		if (!game || !game.active) return;
 		game.active = false; clearInterval(musicTimer);
-		const reward = Math.floor((won ? 70 : 22) + game.score / 8);
-		state.credits += reward; state.shards += won ? 2 : 1; state.best = Math.max(state.best, game.score); state.completed = true;
-		gain("credits", reward); if (won) gain("wins", 1);
-		if (won) { state.clears++; if (game.mode === "Campaign") state.stage = Math.min(51, state.stage + 1); }
-		state.leaderboard.push({ name: "UNREGISTERED", mode: game.mode, score: game.score, pending: true });
-		game.result = { message: won ? "SECTOR CLEARED" : "HULL BREACHED", reward, score: game.score };
+		const sandbox = game.mode === "Boss Sandbox";
+		const trialClear = game.mode === "Ascension Trial" && won && Rules.canStartAscensionTrial(state);
+		const reward = sandbox ? 0 : Math.floor(((won ? 70 : 22) + game.score / 8) * game.effects.rewardMultiplier);
+		if (!sandbox) {
+			state.credits += reward; state.shards += won ? 2 : 1; state.best = Math.max(state.best, game.score);
+			gain("credits", reward); if (won) gain("wins", 1);
+			if (won) {
+				state.clears++;
+				if (game.mode === "Campaign") { state.campaignClears = Math.min(50, state.campaignClears + 1); state.stage = Math.min(51, state.campaignClears + 1); }
+			}
+			if (trialClear) {
+				state.finalTrialComplete = true; state.finalBossDefeated = true; state.finalRivalDefeated = true;
+				state.completionRecordPending = true; state.completed = true;
+			}
+			state.leaderboard.push({ id: crypto.randomUUID(), name: "UNREGISTERED", mode: game.mode, score: game.score, pending: trialClear, ascensionClear: trialClear });
+			gain("survive", Math.floor(game.elapsed));
+		}
+		game.result = { message: sandbox ? (won ? "SANDBOX TEST CLEARED" : "SANDBOX TEST ENDED") : trialClear ? "ASCENSION COMPLETE" : won ? "SECTOR CLEARED" : "HULL BREACHED", reward, score: game.score };
 		save(); sound(won ? 620 : 95, 0.6, won ? "sine" : "sawtooth");
-		gain("survive", Math.floor(game.elapsed));
-		if (state.stage >= 51 && state.ranks.reduce((sum, rank) => sum + rank, 0) === 540) notify("Ascension conditions met. Rebirth is ready.");
 		render();
-		notify(`${won ? "Sector cleared" : "Run complete"} · ${reward} credits`);
+		if (trialClear) notify("Ascension Trial complete. Hall of Ascension registration is unlocked.");
+		else if (sandbox) notify("Sandbox test ended. Campaign progress and rewards were not changed.");
+		else notify(`${won ? "Sector cleared" : "Run complete"} · ${reward} credits`);
 	}
 	function tick(now) {
 		const delta = Math.min(0.04, (now - lastTick) / 1000); lastTick = now;
-		if (!game || !game.active) return;
+		if (!game || !game.active || game.paused) return;
 		game.elapsed += delta;
 		const bounds = game.canvas.getBoundingClientRect(); const width = bounds.width; const height = bounds.height;
-		const speed = 0.42 * delta;
+		const speed = 0.42 * game.effects.movementMultiplier * delta;
+		if (keys.has("Shift") && now - game.lastDash > 950 * game.effects.dashCooldownMultiplier) { game.player.x = Math.min(0.63, game.player.x + 0.13); game.lastDash = now; game.invulnerableUntil = now + 180; }
 		if (keys.has("ArrowUp") || keys.has("w") || keys.has("W") || keys.has("up")) game.player.y -= speed;
 		if (keys.has("ArrowDown") || keys.has("s") || keys.has("S") || keys.has("down")) game.player.y += speed;
 		if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A") || keys.has("left")) game.player.x -= speed;
 		if (keys.has("ArrowRight") || keys.has("d") || keys.has("D") || keys.has("right")) game.player.x += speed;
 		game.player.x = Math.max(0.04, Math.min(0.63, game.player.x)); game.player.y = Math.max(0.08, Math.min(0.9, game.player.y));
-		game.boss.phase += delta;
+		game.boss.phase += delta * (game.bossConfig?.speed || 1) * game.enemyDifficulty;
 		game.boss.x = 0.77 + Math.sin(game.boss.phase * (game.mode === "Chaos Trial" ? 2.3 : 1.25)) * 0.12;
 		game.boss.y = 0.2 + Math.sin(game.boss.phase * 1.8) * 0.11;
-		if ((keys.has(" ") || keys.has("fire") || pointerDown) && now - game.lastShot > 240) {
-			game.bullets.push({ x: game.player.x + 0.05, y: game.player.y, speed: 1.08 }); game.lastShot = now; gain("shots", 1); sound(390, 0.05, "square");
+		game.hp = Math.min(game.effects.maxHull, game.hp + game.effects.hullRegenPerSecond * delta);
+		if ((keys.has(" ") || keys.has("fire") || pointerDown) && now - game.lastShot > 240 / game.effects.fireRateMultiplier) {
+			game.bullets.push({ x: game.player.x + 0.05, y: game.player.y, speed: 1.08 * game.effects.projectileSpeedMultiplier }); game.lastShot = now; gain("shots", 1); sound(390, 0.05, "square");
 		}
-		if (now - game.lastEnemyShot > (game.mode === "Chaos Trial" ? 570 : 900)) {
+		const attackInterval = Math.max(250, (game.mode === "Chaos Trial" ? 570 : 900) / (game.bossConfig?.attackRate || 1) / game.enemyDifficulty * (1 + game.effects.enemySlow));
+		if (now - game.lastEnemyShot > attackInterval) {
 			const dx = game.player.x - game.boss.x; const dy = game.player.y - game.boss.y; const length = Math.hypot(dx, dy) || 1;
-			game.enemyBullets.push({ x: game.boss.x - 0.035, y: game.boss.y + 0.02, vx: dx / length * 0.31, vy: dy / length * 0.31 }); game.lastEnemyShot = now;
+			const angle = Math.atan2(dy, dx);
+			const offsets = game.bossConfig?.attackPattern === "spread" ? [-0.26, 0, 0.26] : game.bossConfig?.attackPattern === "sweep" ? [Math.sin(game.elapsed * 1.6) * 0.34] : [0];
+			for (const offset of offsets) game.enemyBullets.push({ x: game.boss.x - 0.035, y: game.boss.y + 0.02, vx: Math.cos(angle + offset) * 0.31 * game.enemyDifficulty, vy: Math.sin(angle + offset) * 0.31 * game.enemyDifficulty });
+			game.lastEnemyShot = now;
 		}
-		const impactRank = state.ranks.slice(0, 10).reduce((sum, rank) => sum + rank, 0);
-		const armorRank = state.ranks.slice(30, 40).reduce((sum, rank) => sum + rank, 0);
-		game.bullets = game.bullets.filter((bullet) => { bullet.x += bullet.speed * delta; if (Math.hypot((bullet.x - game.boss.x) * width, (bullet.y - game.boss.y) * height) < 30) { game.bossHp -= 5 + impactRank; game.score += 12; return false; } return bullet.x < 1.1; });
-		game.enemyBullets = game.enemyBullets.filter((bullet) => { bullet.x += bullet.vx * delta; bullet.y += bullet.vy * delta; if (Math.hypot((bullet.x - game.player.x) * width, (bullet.y - game.player.y) * height) < 22) { if (now - game.lastDamage > 480) { game.hp -= Math.max(4, (game.mode === "Chaos Trial" ? 13 : 10) - armorRank); game.lastDamage = now; sound(115, 0.12, "sawtooth"); } return false; } if (bullet.x < game.player.x - 0.03 && Math.abs(bullet.y - game.player.y) < 0.07) { gain("dodges", 1); return false; } return bullet.x > -0.08 && bullet.x < 1.08 && bullet.y > -0.08 && bullet.y < 1.08; });
+		game.bullets = game.bullets.filter((bullet) => {
+			bullet.x += bullet.speed * delta;
+			bullet.y += Math.max(-0.28, Math.min(0.28, (game.boss.y - bullet.y) * game.effects.homingStrength)) * delta;
+			if (Math.hypot((bullet.x - game.boss.x) * width, (bullet.y - game.boss.y) * height) < 30) {
+				const critical = Math.random() < game.effects.criticalChance;
+				let damage = 5 * game.effects.damageMultiplier * (critical ? 1.8 : 1) * (1 - game.bossArmor * (1 - game.effects.armorPierce));
+				if (Math.random() < game.effects.chainChance + game.effects.repeatChance) damage *= 1.35;
+				game.bossHp -= damage; game.score += 12; game.hp = Math.min(game.effects.maxHull, game.hp + game.effects.killHeal); return false;
+			}
+			return bullet.x < 1.1;
+		});
+		game.enemyBullets = game.enemyBullets.filter((bullet) => {
+			bullet.x += bullet.vx * delta; bullet.y += bullet.vy * delta;
+			if (Math.hypot((bullet.x - game.player.x) * width, (bullet.y - game.player.y) * height) < 22) {
+				if (now > (game.invulnerableUntil || 0) && now - game.lastDamage > 480) {
+					let damage = (game.mode === "Chaos Trial" ? 13 : 10) * game.enemyDifficulty;
+					const shieldAbsorbed = Math.min(game.shield, damage); game.shield -= shieldAbsorbed; damage -= shieldAbsorbed; game.hp -= damage;
+					game.lastDamage = now; sound(115, 0.12, "sawtooth");
+				}
+				return false;
+			}
+			if (bullet.x < game.player.x - 0.03 && Math.abs(bullet.y - game.player.y) < 0.07) { gain("dodges", 1); return false; }
+			return bullet.x > -0.08 && bullet.x < 1.08 && bullet.y > -0.08 && bullet.y < 1.08;
+		});
 		game.score += Math.floor(delta * (game.mode === "Endurance" ? 16 : 4));
 		if (game.mode === "Endurance" && game.elapsed >= 70) return endGame(true);
-		if (game.bossHp <= 0 && game.mode !== "Endurance") return endGame(true);
+		if (game.bossHp <= 0 && game.mode === "Ascension Trial" && !game.finalTrialRivalPhase) {
+			game.finalTrialRivalPhase = true; game.bossHp = game.maxBossHp = Math.round(1000 * game.enemyDifficulty); game.enemyBullets.length = 0; game.boss.phase = 0; notify("Final rival engaged. Keep moving."); sound(180, 0.4, "sawtooth");
+		}
+		else if (game.bossHp <= 0 && game.mode !== "Endurance") return endGame(true);
 		if (game.hp <= 0) return endGame(false);
 		if (game.mode === "Rival Duel" && game.elapsed > 65) return endGame(true);
 		drawGame(); frame = requestAnimationFrame(tick);
@@ -458,13 +826,13 @@
 		if (environment % 3 === 1) { for (let radius = 30; radius < Math.max(w, h); radius += 62) { ctx.beginPath(); ctx.arc(w * 0.72, h * 0.46, radius, 0, Math.PI * 2); ctx.stroke(); } }
 		if (environment % 3 === 2) { for (let x = 0; x < w; x += 96) { ctx.fillStyle = `${palettes[environment]}09`; ctx.fillRect(x, 0, 32, h); } }
 		for (let i = 0; i < 14; i++) { const x = (i * 127 + game.elapsed * 13) % w; const y = (i * 71) % h; ctx.fillStyle = "rgba(214,240,223,.45)"; ctx.fillRect(x, y, 1.5, 1.5); }
-		const accent = palettes[state.equipped.theme];
 		const px = game.player.x * w; const py = game.player.y * h; const bx = game.boss.x * w; const by = game.boss.y * h;
-		const skinIndex = state.equipped.skin;
-		ctx.save(); ctx.translate(px, py); ctx.fillStyle = palettes[skinIndex % palettes.length]; ctx.shadowColor = accent; ctx.shadowBlur = 17; ctx.beginPath(); if (skinIndex % 3 === 0) { ctx.moveTo(22, 0); ctx.lineTo(-13, -13); ctx.lineTo(-8, 0); ctx.lineTo(-13, 13); } else if (skinIndex % 3 === 1) { ctx.moveTo(18, 0); ctx.lineTo(8, -12); ctx.lineTo(-14, -9); ctx.lineTo(-10, 0); ctx.lineTo(-14, 9); ctx.lineTo(8, 12); } else { ctx.moveTo(22, 0); ctx.lineTo(7, -17); ctx.lineTo(-15, -11); ctx.lineTo(-8, 0); ctx.lineTo(-15, 11); ctx.lineTo(7, 17); } ctx.closePath(); ctx.fill(); ctx.fillStyle = "#e6ffff"; ctx.fillRect(-5, -3, 12, 6); ctx.restore();
-		ctx.save(); ctx.translate(bx, by); ctx.rotate(Math.PI); ctx.fillStyle = "#ff735f"; ctx.shadowColor = "#ff735f"; ctx.shadowBlur = 20; ctx.beginPath(); ctx.moveTo(27, 0); ctx.lineTo(-12, -22); ctx.lineTo(-20, 0); ctx.lineTo(-12, 22); ctx.closePath(); ctx.fill(); ctx.fillStyle = "#ffd0ad"; ctx.fillRect(-7, -5, 12, 10); ctx.restore();
-		for (const bullet of game.bullets) { ctx.fillStyle = palettes[state.equipped.trail % palettes.length]; ctx.shadowColor = palettes[state.equipped.trail % palettes.length]; ctx.shadowBlur = 11; ctx.beginPath(); ctx.ellipse(bullet.x * w, bullet.y * h, 8 + state.equipped.trail % 4, 2.5, 0, 0, Math.PI * 2); ctx.fill(); }
-		for (const bullet of game.enemyBullets) { ctx.fillStyle = "#ff8068"; ctx.shadowColor = "#ff584c"; ctx.shadowBlur = 9; ctx.beginPath(); ctx.arc(bullet.x * w, bullet.y * h, 4, 0, Math.PI * 2); ctx.fill(); }
+		ctx.imageSmoothingEnabled = false;
+		drawPilotSprite(ctx, px, py, 35, state.equipped.skin, palettes[state.equipped.skin % palettes.length]);
+		const rival = game.bossConfig || (game.mode === "Ascension Trial" && game.finalTrialRivalPhase ? ascensionRivalSprite : standardRivalSprite);
+		drawBossPixels(ctx, rival, bx - 31, by - 31, 62, Math.floor(game.elapsed * 3));
+		for (const bullet of game.bullets) { ctx.fillStyle = palettes[state.equipped.trail % palettes.length]; ctx.fillRect(bullet.x * w, bullet.y * h, 8, 3); }
+		for (const bullet of game.enemyBullets) { ctx.fillStyle = "#ff777c"; ctx.fillRect(bullet.x * w, bullet.y * h, 5, 5); }
 		ctx.shadowBlur = 0;
 		if (game.active) {
 			$("#player-hp").textContent = `HULL ${Math.max(0, Math.ceil(game.hp))}%`;
@@ -472,9 +840,96 @@
 			$("#run-status").textContent = `${Math.floor(game.elapsed)}s · ${game.score} PTS`;
 		}
 	}
+	function navigate(view) {
+		const wasPaused = game?.paused;
+		currentView = view;
+		if (game?.active && view !== "play") { game.paused = true; cancelAnimationFrame(frame); keys.clear(); }
+		render();
+		if (game?.active && view === "play" && wasPaused) { game.paused = false; game.canvas = $("#arena"); lastTick = performance.now(); frame = requestAnimationFrame(tick); }
+	}
+	function addBoss(template) {
+		if (state.bosses.length >= 20) return notify("Workshop limit reached: 20 designs.");
+		const boss = template ? createTemplateBoss(template) : createBlankBoss();
+		state.bosses.push(boss); state.selectedBossId = boss.id; editorFrame = 0; editorHistory = []; editorRedo = []; save(); render();
+	}
+	function undoEditor(redo = false) {
+		const source = redo ? editorRedo : editorHistory; const destination = redo ? editorHistory : editorRedo;
+		const snapshot = source.pop(); const boss = selectedBoss();
+		if (!snapshot || !boss?.frames[editorFrame]) return;
+		destination.push(JSON.stringify(boss.frames[editorFrame]));
+		boss.frames[editorFrame] = JSON.parse(snapshot); save(); render();
+	}
+	function handleEditorAction(event) {
+		const target = event.target;
+		if (target.closest("[data-new-boss]")) { addBoss(); return true; }
+		const templateButton = target.closest("[data-template]");
+		if (templateButton) { addBoss(EDITOR_TEMPLATES.find((template) => template.id === templateButton.dataset.template)); return true; }
+		const selection = target.closest("[data-select-boss]");
+		if (selection) { state.selectedBossId = selection.dataset.selectBoss; editorFrame = 0; editorHistory = []; editorRedo = []; save(); render(); return true; }
+		const tool = target.closest("[data-tool]"); if (tool) { editorTool = tool.dataset.tool; render(); return true; }
+		const colorButton = target.closest("[data-color]"); if (colorButton) { editorColor = colorButton.dataset.color; render(); return true; }
+		const layer = target.closest("[data-layer]"); if (layer) { editorLayer = layer.dataset.layer; render(); return true; }
+		const frame = target.closest("[data-frame]"); if (frame) { editorFrame = Number(frame.dataset.frame); editorHistory = []; editorRedo = []; render(); return true; }
+		if (target.closest("[data-add-frame]")) { const boss = selectedBoss(); if (boss.frames.length >= 8) return notify("Animation limit reached: 8 frames."); boss.frames.push(JSON.parse(JSON.stringify(boss.frames[editorFrame]))); editorFrame = boss.frames.length - 1; save(); render(); return true; }
+		if (target.closest("[data-delete-frame]")) { const boss = selectedBoss(); if (boss.frames.length > 1) { boss.frames.splice(editorFrame, 1); editorFrame = Math.max(0, editorFrame - 1); save(); render(); } return true; }
+		if (target.closest("[data-undo]")) { undoEditor(); return true; }
+		if (target.closest("[data-redo]")) { undoEditor(true); return true; }
+		if (target.closest("[data-save-boss]")) { save(); notify("Boss design saved to this browser."); return true; }
+		if (target.closest("[data-duplicate-boss]")) {
+			if (state.bosses.length >= 20) return notify("Workshop limit reached: 20 designs.");
+			const copy = sanitizeBoss({ ...JSON.parse(JSON.stringify(selectedBoss())), id: crypto.randomUUID(), name: `${selectedBoss().name} Copy` });
+			state.bosses.push(copy); state.selectedBossId = copy.id; editorFrame = 0; editorHistory = []; editorRedo = []; save(); render(); return true;
+		}
+		if (target.closest("[data-delete-boss]")) {
+			state.bosses = state.bosses.filter((boss) => boss.id !== state.selectedBossId);
+			if (!state.bosses.length) state.bosses.push(createBlankBoss());
+			state.selectedBossId = state.bosses[0].id; editorFrame = 0; editorHistory = []; editorRedo = []; save(); render(); return true;
+		}
+		if (target.closest("[data-export-boss]")) {
+			const blob = new Blob([JSON.stringify(selectedBoss(), null, 2)], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `${selectedBoss().name.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "boss"}.json`; link.click(); URL.revokeObjectURL(link.href); return true;
+		}
+		if (target.closest("[data-import-boss]")) { $("#boss-import-file").click(); return true; }
+		if (target.closest("[data-test-boss]")) {
+			const boss = selectedBoss();
+			if (!boss.frames.some((frame) => frame.body.some(Boolean) || frame.effects.some(Boolean))) return notify("Draw at least one pixel before testing this boss.");
+			selectedMode = "Boss Sandbox"; navigate("play"); newGame(); return true;
+		}
+		const zoom = target.closest("[data-zoom]"); if (zoom) { editorZoom = Math.max(0.65, Math.min(1.35, editorZoom + Number(zoom.dataset.zoom) * 0.1)); render(); return true; }
+		return false;
+	}
+	function handleBossInput(event) {
+		const target = event.target;
+		if (target.matches("[data-custom-color]")) { editorColor = target.value; return; }
+		const prop = target.closest("[data-boss-prop]");
+		if (!prop) return;
+		const boss = selectedBoss(); const key = prop.dataset.bossProp;
+		boss[key] = ["health", "armor", "speed", "attackRate"].includes(key) ? Number(prop.value) : prop.value;
+		const output = key === "health" ? "#boss-health-value" : key === "armor" ? "#boss-armor-value" : key === "speed" ? "#boss-speed-value" : key === "attackRate" ? "#boss-rate-value" : null;
+		if (output) $(output).textContent = key === "speed" || key === "attackRate" ? `${Number(prop.value).toFixed(2)}×` : prop.value;
+		save();
+	}
+	function importBossFile(event) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+		if (state.bosses.length >= 20) { notify("Workshop limit reached: 20 designs."); event.target.value = ""; return; }
+		const reader = new FileReader();
+		reader.onload = () => {
+			try {
+				const imported = sanitizeBoss(JSON.parse(String(reader.result)));
+				if (!imported) throw new Error("invalid boss document");
+				imported.id = crypto.randomUUID(); state.bosses.push(imported); state.selectedBossId = imported.id; editorFrame = 0; editorHistory = []; editorRedo = []; save(); render(); notify("Boss design imported.");
+			} catch (_) { notify("That boss JSON could not be imported."); }
+			event.target.value = "";
+		};
+		reader.readAsText(file);
+	}
 	function downloadStandalone() {
-		fetch("mechanics.js").then((response) => { if (!response.ok) throw new Error("unavailable"); return response.text(); }).then((source) => {
-			const html = `<!doctype html>\n${document.documentElement.outerHTML.replace(/<script src="mechanics.js"><\/script>/, `<script>${source.replace(/<\/script/gi, "<\\/script")}<\/script>`)}`;
+		Promise.all([fetch("game-rules.js"), fetch("mechanics.js")]).then(async ([rulesResponse, sourceResponse]) => {
+			if (!rulesResponse.ok || !sourceResponse.ok) throw new Error("unavailable");
+			return Promise.all([rulesResponse.text(), sourceResponse.text()]);
+		}).then(([rules, source]) => {
+			const inline = `<script>${rules.replace(/<\/script/gi, "<\\/script")}\n${source.replace(/<\/script/gi, "<\\/script")}<\/script>`;
+			const html = `<!doctype html>\n${document.documentElement.outerHTML.replace(/<script src="game-rules\.js"><\/script>\s*<script src="mechanics\.js"><\/script>/, inline)}`;
 			const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([html], { type: "text/html" })); link.download = "bossforge-ascension-standalone.html"; link.click(); URL.revokeObjectURL(link.href);
 		}).catch(() => notify("Standalone export needs the game hosted over HTTP. See README for local packaging."));
 	}
@@ -487,7 +942,8 @@
 	});
 	document.addEventListener("pointerup", () => { pointerDown = false; keys.delete("fire"); });
 	document.addEventListener("click", (event) => {
-		const viewButton = event.target.closest("[data-view]"); if (viewButton) { currentView = viewButton.dataset.view; render(); return; }
+		const viewButton = event.target.closest("[data-view]"); if (viewButton) { navigate(viewButton.dataset.view); return; }
+		if (currentView === "boss" && handleEditorAction(event)) return;
 		const modeButton = event.target.closest("[data-mode]"); if (modeButton) { selectedMode = modeButton.dataset.mode; render(); return; }
 		const control = event.target.closest("[data-control]"); if (control && control.dataset.control !== "fire") { const direction = control.dataset.control; keys.add(direction); setTimeout(() => keys.delete(direction), 170); return; }
 		if (event.target.closest("#launch")) { newGame(); return; }
@@ -496,20 +952,38 @@
 		const equip = event.target.closest("[data-equip]"); if (equip) { state.equipped[equip.dataset.equip] = Number(equip.dataset.id); save(); render(); return; }
 		const chestButton = event.target.closest("[data-chest]");
 		if (chestButton) { const index = Number(chestButton.dataset.chest); if (state.chests[index] <= Date.now()) { state.credits += 65 + index * 35; state.shards += 1 + (index === 2 ? 1 : 0); state.chests[index] = Date.now() + [25000, 55000, 95000][index]; save(); notify("Cache collected · credits and forge shards added."); render(); sound(520, 0.2, "sine"); } return; }
-		if (event.target.closest("#prestige")) { if (state.stage < 51 || state.ranks.reduce((sum, rank) => sum + rank, 0) < 540) return; state.prestige++; state.stage = 1; state.clears = 0; state.ranks.fill(0); state.credits += 5000; save(); notify("Ascension complete · +5,000 credits."); render(); return; }
+		if (event.target.closest("#prestige")) { if (!Rules.canRegisterLeaderboard(state)) return notify("Complete the Campaign, network, and Ascension Trial first."); state.prestige++; state.stage = 1; state.campaignClears = 0; state.clears = 0; state.ranks.fill(0); state.finalTrialComplete = false; state.finalBossDefeated = false; state.finalRivalDefeated = false; state.completionRecordPending = false; state.completed = false; state.credits += 5000; save(); notify("Ascension complete · +5,000 credits."); render(); return; }
 		if (event.target.closest("#download-standalone")) downloadStandalone();
+	});
+	document.addEventListener("input", handleBossInput);
+	document.addEventListener("change", (event) => {
+		const target = event.target;
+		if (target.matches("[data-symmetry]")) { editorSymmetry = target.checked; return; }
+		if (target.matches("[data-grid]")) { editorGrid = target.checked; drawEditorCanvas(); return; }
+		if (target.matches("[data-layer-visible]")) { selectedBoss().frames[editorFrame].visible[editorLayer] = target.checked; save(); drawEditorCanvas(); return; }
+		if (target.matches("[data-size]")) { resizeBoss(selectedBoss(), Number(target.value)); editorHistory = []; editorRedo = []; save(); render(); return; }
+		if (target.matches("#boss-import-file")) importBossFile(event);
 	});
 	document.addEventListener("submit", (event) => {
 		if (event.target.id !== "record-form") return;
-		event.preventDefault(); const name = String(new FormData(event.target).get("nickname")).trim().slice(0, 18); if (name.length < 2) return;
-		const pending = [...state.leaderboard].reverse().find((entry) => entry.pending);
-		if (pending) { pending.name = name; delete pending.pending; }
-		state.completed = false; save(); notify(`Record registered as ${name}.`); render();
+		event.preventDefault();
+		if (!state.completionRecordPending || !Rules.canRegisterLeaderboard(state)) return notify("Nickname registration requires the completed Ascension Trial.");
+		const name = String(new FormData(event.target).get("nickname")).trim().slice(0, 18); if (name.length < 2) return;
+		const pending = [...state.leaderboard].reverse().find((entry) => entry.pending && entry.ascensionClear);
+		if (!pending) return notify("No eligible Ascension record is waiting.");
+		pending.name = name; delete pending.pending; state.completionRecordPending = false; save(); notify(`Final record registered as ${name}.`); render();
 	});
 	$("#menu-toggle").addEventListener("click", () => document.body.classList.toggle("nav-collapsed"));
 	$("#sound-toggle").addEventListener("click", () => { state.sound = !state.sound; save(); $("#sound-toggle").textContent = state.sound ? "SOUND ON" : "SOUND OFF"; });
 	$("#sound-toggle").textContent = state.sound ? "SOUND ON" : "SOUND OFF";
 	setInterval(() => { if (currentView === "vault") render(); }, 1000);
+	setInterval(() => { if (currentView === "boss") drawEditorCanvas(); }, 220);
+	document.addEventListener("visibilitychange", () => {
+		if (!game?.active) return;
+		if (document.hidden) { game.pausedBeforeHidden = !game.paused; game.paused = true; cancelAnimationFrame(frame); audioContext?.suspend(); }
+		else if (game.pausedBeforeHidden && currentView === "play") { game.paused = false; lastTick = performance.now(); frame = requestAnimationFrame(tick); audioContext?.resume(); }
+		else if (!game.paused) audioContext?.resume();
+	});
 	render();
 })();
 
